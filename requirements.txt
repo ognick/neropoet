@@ -2,3 +2,4 @@ vk==2.0.2
 word2vec==0.9.1
 pymorphy2==0.8
 progressbar2==3.20.0
+pillow==3.3.1
