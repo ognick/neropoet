@@ -7,10 +7,10 @@ import sys
 from logging import getLogger
 import requests
 import json
-import random
 import vk
 from settings import settings
 from sys_utilst import load, save
+
 from grammar_utils import normalize_sentence
 from w2v_model import in_vocab
 from pictures.generator import generate_image
@@ -86,16 +86,17 @@ def answer(source_file_name):
         lambda **kwargs : api.messages.getDialogs(unanswered=1, preview_length=20, **kwargs)
     )
 
+    curr_time = int(time.time())
     for item in messages:
         msg = item['message']
-        user_id = msg['user_id']
+        init_user_id = msg['user_id']
 
         # if user_id not in settings['tester_ids']:
         #     continue
 
-        init_sign = followers.get(user_id)
+        init_sign = followers.get(init_user_id)
         if not init_sign:
-            api.messages.send(user_id=user_id, message=NOT_FOLLOW_MSG)
+            api.messages.send(user_id=init_user_id, message=NOT_FOLLOW_MSG)
             time.sleep(settings['sleep'])
             continue
 
@@ -111,16 +112,15 @@ def answer(source_file_name):
         logger.info('good words %s' % title)
         blocks = build(mask_to_sentences, matched_masks, system, good_words)
         if not blocks:
-            api.messages.send(user_id=user_id, message=NO_BLOCKS_MSG)
+            api.messages.send(user_id=init_user_id, message=NO_BLOCKS_MSG)
             time.sleep(settings['sleep'])
             continue
 
-        curr_user_cache = used_cache.setdefault(user_id, set())
+        _, curr_user_cache = used_cache.setdefault(init_user_id, (curr_time, set()))
         while blocks:
-            block_id = random.randint(0, len(blocks)) if user_id in settings['tester_ids'] else 0
-            block = blocks.pop(block_id)
+            block = blocks.pop(0)
             post = []
-            is_author = {user_id: True}
+            is_author = {init_user_id: True}
 
             for sentence in block:
                 post.append(sentence['text'])
@@ -135,15 +135,16 @@ def answer(source_file_name):
             is_author.update({uid: False for uid in settings['tester_ids']})
             for user_id, is_cached in is_author.iteritems():
                 if is_cached:
-                    user_cache = used_cache.setdefault(user_id, set())
-                    if user_cache & s_post:
+                    last_time, user_cache = used_cache.setdefault(user_id, (curr_time, set()))
+                    if (user_id != user_id) and \
+                            ((user_cache & s_post) or
+                                curr_time - last_time < settings['auto_reply_delay']):
                         continue
-
                 try:
                     sign = followers[user_id] if is_cached else init_sign
                     send_image(api, user_id, sign, post, title)
                     if is_cached:
-                        user_cache |= s_post
+                        used_cache[user_id] = (curr_time, user_cache | s_post)
                         save(used_cache, 'used_cache.bin')
                     logger.info('send to %s' % sign)
                 except vk.exceptions.VkAPIError as error:

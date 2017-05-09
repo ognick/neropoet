@@ -5,5 +5,6 @@ settings = {
     'sleep': 0.30,
     'similarity_threshold': 0.3,
     'logging_level': 'INFO',
+    'auto_reply_delay': 172800,
 }
 settings.update(credentials)
