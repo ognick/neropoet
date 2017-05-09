@@ -136,7 +136,7 @@ def answer(source_file_name):
             for user_id, is_cached in is_author.iteritems():
                 if is_cached:
                     last_time, user_cache = used_cache.setdefault(user_id, (curr_time, set()))
-                    if (user_id != user_id) and \
+                    if (init_user_id != user_id) and \
                             ((user_cache & s_post) or
                                 curr_time - last_time < settings['auto_reply_delay']):
                         continue
