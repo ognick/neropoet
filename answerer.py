@@ -92,7 +92,8 @@ def answer(source_file_name):
         # if user_id not in settings['tester_ids']:
         #     continue
 
-        if user_id not in followers:
+        init_sign = followers.get(user_id)
+        if not init_sign:
             api.messages.send(user_id=user_id, message=NOT_FOLLOW_MSG)
             time.sleep(settings['sleep'])
             continue
@@ -137,7 +138,7 @@ def answer(source_file_name):
                         continue
 
                 try:
-                    sign = followers[user_id]
+                    sign = followers[user_id] if is_cached else init_sign
                     _answer(user_id, sign, post, title)
                     if is_cached:
                         user_cache |= s_post
