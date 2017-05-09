@@ -23,4 +23,3 @@ def n_similarity(words, word):
 
 def extract_key_words(words):
     return set(word for word in words if word in _g_w2v_model)
-

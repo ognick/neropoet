@@ -19,19 +19,19 @@ MAX_TEXT_WIDTH = 2000
 
 TEMPLATES = {
     720 : {
-        'image': Image.open('small.jpg'),
+        'image': Image.open('pictures/small.jpg'),
         'start_pos_y': 140,
         'min_offset_x': 40,
         'align': ALIGN.CENTER,
     },
     880 : {
-        'image': Image.open('middle.jpg'),
+        'image': Image.open('pictures/middle.jpg'),
         'start_pos_y': 140,
         'min_offset_x': 40,
         'align': ALIGN.CENTER,
     },
     MAX_TEXT_WIDTH: {
-        'image': Image.open('big.jpg'),
+        'image': Image.open('pictures/big.jpg'),
         'start_pos_y': 140,
         'min_offset_x': 40,
         'align': ALIGN.CENTER,
@@ -39,8 +39,8 @@ TEMPLATES = {
 }
 
 
-_common_font = ImageFont.truetype("tahoma.ttf", COMMON_FONT_SIZE)
-_sign_font = ImageFont.truetype("tahoma.ttf", SIGN_FONT_SIZE)
+_common_font = ImageFont.truetype("pictures/tahoma.ttf", COMMON_FONT_SIZE)
+_sign_font = ImageFont.truetype("pictures/tahoma.ttf", SIGN_FONT_SIZE)
 _draw = ImageDraw.Draw(TEMPLATES[MAX_TEXT_WIDTH]['image'])
 
 

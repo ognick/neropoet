@@ -4,7 +4,7 @@
 import sys
 from logging import getLogger
 from settings import settings
-from sys_utilst import load, get_bar
+from sys_utilst import load, get_bar, save, change_postfix
 from style import parse_rhyme_system, RHYME_SYSTEM
 from grammar_utils import *
 
@@ -53,7 +53,8 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
             s1['similar'] = similar1
             last_word_s1 = s1['last_word']
             cur_similarities = {}
-            similarities.setdefault(similar1, []).append((s1, cur_similarities))
+            similarities.setdefault(similar1, []).append(
+                (s1, cur_similarities))
 
             for j in xrange(0, len(sentences)):
                 s2 = sentences[j]
@@ -118,6 +119,7 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
     rt1, rt2 = unique_types
     for i, pair1 in enumerate(pairs):
         if len(blocks) >= settings['max_block_count']:
+            logger.info('building blocks %d done.' % len(blocks))
             return blocks
 
         try:
@@ -157,6 +159,7 @@ def main():
         for line in block:
             print line['text']
         print
+    save(blocks, change_postfix(file_name, 'out'))
     return 0
 
 
