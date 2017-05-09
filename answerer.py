@@ -134,7 +134,7 @@ def answer(source_file_name):
             for user_id, is_cached in is_author.iteritems():
                 if is_cached:
                     user_cache = used_cache.setdefault(user_id, set())
-                    if curr_user_cache & s_post:
+                    if user_cache & s_post:
                         continue
 
                 try:
