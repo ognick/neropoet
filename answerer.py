@@ -152,7 +152,7 @@ def answer(source_file_name):
                     continue
             break
         else:
-            api.messages.send(user_id=user_id, message=NO_BLOCKS_MSG)
+            api.messages.send(user_id=init_user_id, message=NO_BLOCKS_MSG)
             time.sleep(settings['sleep'])
 
     return 0
