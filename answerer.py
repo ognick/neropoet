@@ -135,7 +135,7 @@ def answer(source_file_name):
             is_author.update({uid: False for uid in settings['tester_ids']})
             for user_id, is_cached in is_author.iteritems():
                 if is_cached:
-                    last_time, user_cache = used_cache.setdefault(user_id, (curr_time, set()))
+                    last_time, user_cache = used_cache.setdefault(user_id, (0, set()))
                     if (init_user_id != user_id) and \
                             ((user_cache & s_post) or
                                 curr_time - last_time < settings['auto_reply_delay']):
