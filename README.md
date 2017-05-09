@@ -7,8 +7,8 @@ Lyrics generator for <b>russian language</b> based on users posts in the <a href
 
 ## Install:
 
-#### 2. Execute: ``` pip install -r requirements.txt ```
-#### 3. Make ./credentails.py:
+#### 1. Execute: ``` pip install -r requirements.txt ```
+#### 2. Make ./credentials.py:
 <a href="https://vk.com/dev/authentication">read more</a>
 ```
  credentials = {
@@ -25,7 +25,7 @@ Lyrics generator for <b>russian language</b> based on users posts in the <a href
 }
 ```
 
-#### 4. Download word2vec model <a href="https://vk.com/doc4294291_445594054">wiki-model.bin</a> and move to ```./dictionary/wiki-model.bin```
+#### 3. Download word2vec model <a href="https://vk.com/doc4294291_445594054">wiki-model.bin</a> and move to ```./dictionary/wiki-model.bin```
 
 
 ## Run:
