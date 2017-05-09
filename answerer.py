@@ -42,7 +42,7 @@ def get_all_items(max_count_per_request, getter):
     return items
 
 
-def main(source_file_name):
+def answer(source_file_name):
     try:
         used_cache = load('used_cache.bin')
     except IOError:
@@ -67,7 +67,7 @@ def main(source_file_name):
         lambda **kwargs : api.messages.getDialogs(unanswered=1, preview_length=20, **kwargs)
     )
 
-    def _response(user_id, post):
+    def _answer(user_id, post):
         sign = followers[user_id]
         logger.info('sending to %s' % sign)
 
@@ -88,8 +88,8 @@ def main(source_file_name):
         msg = item['message']
         user_id = msg['user_id']
 
-        if user_id not in settings['tester_ids']:
-            continue
+        # if user_id not in settings['tester_ids']:
+        #     continue
 
         if user_id not in followers:
             api.messages.send(user_id=user_id, message=NOT_FOLLOW_MSG)
@@ -135,7 +135,7 @@ def main(source_file_name):
                         continue
 
                 try:
-                    _response(user_id, post)
+                    _answer(user_id, post)
                     if is_cached:
                         user_cache |= s_post
                         save(used_cache, 'used_cache.bin')
@@ -151,4 +151,4 @@ def main(source_file_name):
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1]))
+    sys.exit(answer(sys.argv[1]))

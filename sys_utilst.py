@@ -30,6 +30,12 @@ def load(file_name):
     return cPickle.loads(zlib.decompress(open(file_name, 'rb').read()))
 
 
+def is_exists(file_name):
+    if 'datasets' not in file_name:
+        file_name = _FOLDER + file_name
+    return os.path.exists(file_name)
+
+
 def add_postfix(name, postfix):
     name, ext = tuple(name.split('.'))
     return ''.join([name, '_', postfix, '.', ext])

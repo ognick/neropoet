@@ -125,13 +125,9 @@ def worker_thread(task_queue, result_queue, api):
             _inc_bar()
 
 
-def main():
-    if len(sys.argv) != 3:
-        logger.error('Usage: %s id_start id_end' % sys.argv[0])
-        return 42
-
-    start_id, end_id = [int(i) for i in sys.argv[1:3]]
+def download(start_id, end_id):
     dump_file_name = 'vk_%d_%d.bin' % (start_id, end_id)
+    logger.info('download to %s' % dump_file_name)
     session = vk.AuthSession(**settings['bot_auth'])
     api = vk.API(session, lang='en', v='5.45')
     task_queue = TQueue.Queue()
@@ -180,8 +176,11 @@ def main():
     save(data, add_postfix(dump_file_name, 'ext'))
     logger.info('Done %d sentences.' % total_count)
 
-    return 0
-
 
 if __name__ == '__main__':
-    sys.exit(main())
+    if len(sys.argv) != 3:
+        logger.error('Usage: %s id_start id_end' % sys.argv[0])
+        sys.exit(42)
+
+    start_id, end_id = [int(i) for i in sys.argv[1:3]]
+    download(start_id, end_id)
