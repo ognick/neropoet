@@ -1,5 +1,8 @@
 # Neropoet
 
+Lyrics generator for <b>russian language</b> based on users posts in the <a href="https://vk.com">vk.com</a> .
+
+
 ## Install:
 
 #### 2. Execute: ``` pip install -r requirements.txt ```
@@ -24,7 +27,9 @@
 
 
 ## Run:
-
+### Console:
 ##### 1. ``` ./downloader.py [start_id] [end_id] ```
 ##### 2. ``` ./poet.py datasets/vk_[start_id]_[end_id]_ext.bin ```
+### GUI:
+##### 1. ``` ./autorun.py [start_id] [end_id] ```
 
