@@ -44,7 +44,16 @@ _sign_font = ImageFont.truetype("pictures/tahoma.ttf", SIGN_FONT_SIZE)
 _draw = ImageDraw.Draw(TEMPLATES[MAX_TEXT_WIDTH]['image'])
 
 
-def generate_image(lines, sign=None, result_file=None):
+def up_and_dot(title):
+    title = title.strip()
+    title = title[0].upper() + title[1:]
+    title = ' '.join(title.split())
+    if title[-1] not in '!?).':
+        title += '.'
+    return title
+
+
+def generate_image(lines, sign=None, title=None, result_file=None):
     widths = [_draw.textsize(line, font=_common_font)[0] for line in lines]
     max_width = max(widths)
     for size in sorted(TEMPLATES.keys()):
@@ -59,8 +68,13 @@ def generate_image(lines, sign=None, result_file=None):
     draw = ImageDraw.Draw(img)
     max_text_width = img.size[0]
     align = template['align']
-    fixed_x = None if align == ALIGN.CENTER else (
-        max_text_width - max_width) / 2
+    fixed_x = None if align == ALIGN.CENTER else (max_text_width - max_width) / 2
+
+    if title:
+        w = _draw.textsize(title, font=_common_font)[0]
+        x = (max_text_width - w) / 2
+        draw.text((x, 60), up_and_dot(title), COMMON_COLOR, font=_common_font)
+
 
     for i, line in enumerate(lines):
         y = template['start_pos_y'] + i * LINE_DISTANCE
@@ -70,7 +84,6 @@ def generate_image(lines, sign=None, result_file=None):
             x = (max_text_width - widths[i]) / 2
         elif align == ALIGN.RIGHT:
             x = (max_width - widths[i]) + fixed_x
-
         draw.text((x, y), line, COMMON_COLOR, font=_common_font)
 
     y = img.size[1] - 80

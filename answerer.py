@@ -67,11 +67,12 @@ def answer(source_file_name):
         lambda **kwargs : api.messages.getDialogs(unanswered=1, preview_length=20, **kwargs)
     )
 
-    def _answer(user_id, post):
-        sign = followers[user_id]
-        logger.info('sending to %s' % sign)
+    def _answer(uid, sign, post, title):
+        logger.info('sending to %s %s' % (sign, title))
+        # if uid not in settings['tester_ids']:
+        #     return
 
-        generate_image(post, sign=sign, result_file='img.jpg')
+        generate_image(post, sign=sign, title=title, result_file='img.jpg')
         img = {'photo': ('img.png', open(r'img.jpg', 'rb'))}
         upload_url = api.photos.getMessagesUploadServer()['upload_url']
         response = json.loads(requests.post(upload_url, files=img).text)
@@ -81,7 +82,7 @@ def answer(source_file_name):
                                                   server=response['server'])
 
         attach = 'photo%s_%s' % (photo_data[0]['owner_id'], photo_data[0]['id'])
-        api.messages.send(user_id=user_id, attachment=[attach])
+        api.messages.send(user_id=uid, attachment=[attach])
         time.sleep(settings['sleep'])
 
     for item in messages:
@@ -99,12 +100,13 @@ def answer(source_file_name):
         words = normalize_sentence(msg['body'])
         logger.info('words %s' % ' '.join(words))
         good_words = set([w for w in words if in_vocab(w)])
-        if not good_words:
+        if len(good_words) != 1:
             api.messages.send(user_id=user_id, message=BAD_WORDS_MSG)
             time.sleep(settings['sleep'])
             continue
 
-        logger.info('good words %s' % ' '.join(good_words))
+        title = ' '.join(good_words)
+        logger.info('good words %s' % title)
         blocks = build(mask_to_sentences, matched_masks, system, good_words)
         if not blocks:
             api.messages.send(user_id=user_id, message=NO_BLOCKS_MSG)
@@ -135,12 +137,13 @@ def answer(source_file_name):
                         continue
 
                 try:
-                    _answer(user_id, post)
+                    sign = followers[user_id]
+                    _answer(user_id, sign, post, title)
                     if is_cached:
                         user_cache |= s_post
                         save(used_cache, 'used_cache.bin')
                 except vk.exceptions.VkAPIError as error:
-                    logger.error(error.message)
+                    logger.error('%s %s' %(sign, error.message))
                     continue
             break
         else:
