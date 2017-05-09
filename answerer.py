@@ -104,7 +104,7 @@ def answer(source_file_name):
         logger.info('words %s' % ' '.join(words))
         good_words = set([w for w in words if in_vocab(w)])
         if len(good_words) != 1:
-            api.messages.send(user_id=user_id, message=BAD_WORDS_MSG)
+            api.messages.send(user_id=init_user_id, message=BAD_WORDS_MSG)
             time.sleep(settings['sleep'])
             continue
 
