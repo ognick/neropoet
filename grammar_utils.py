@@ -40,8 +40,7 @@ BAD_ENDINGS = {
     u'то',
 }
 
-ENDS = '.,:?!)'
-SPLITS = ']}->\n'
+ENDS = frozenset('.,:?!)')
 
 NUMBERS = {
     u'0': u' ноль',

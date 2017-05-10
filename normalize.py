@@ -13,13 +13,16 @@ def get_normal_sentences(post):
     if text is None:
         return []
 
-    for c in SPLITS + ENDS:
+    for c in frozenset(']}>\n') | ENDS:
         text = text.replace(c, c + '|')
 
-    sentences = [s for s in text.split('|') if has_russian_chars(s)]
+    for c in frozenset([' - ']):
+        text = text.replace(c, '|')
+
+    sentences = [s for s in text.split('|') if has_russian_chars(s) and 0 < len(s) < 12]
     long_sentences = []
     for pos, sentence in enumerate(sentences):
-        if 0 < get_length(sentence) < 5:
+        if get_length(sentence) < 6:
             if pos > 0:
                 long_sentences.append(sentences[pos - 1] + sentence)
 
