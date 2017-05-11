@@ -4,7 +4,7 @@ import time
 import sched
 import sys
 
-from multiprocessing import Process
+    from multiprocessing import Process
 from logging import getLogger
 from sys_utilst import is_exists
 
@@ -48,8 +48,8 @@ def reschedule(f):
 @reschedule
 def do_answer():
     if is_exists(file_name):
-        from answerer import answer
-        worker = Process(target=answer, args=(file_name, ))
+        from answerer import loop
+        worker = Process(target=loop, args=(file_name, ))
         worker.run()
 
 

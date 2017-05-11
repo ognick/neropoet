@@ -1,5 +1,6 @@
 # -*- coding: utf-8
 
+import io
 from PIL import Image, ImageFont, ImageDraw
 from settings import settings
 
@@ -19,19 +20,19 @@ MAX_TEXT_WIDTH = 2000
 
 TEMPLATES = {
     720 : {
-        'image': Image.open('pictures/small.jpg'),
+        'image': Image.open('pictures/small.jpg').copy(),
         'start_pos_y': 140,
         'min_offset_x': 40,
         'align': ALIGN.CENTER,
     },
     880 : {
-        'image': Image.open('pictures/middle.jpg'),
+        'image': Image.open('pictures/middle.jpg').copy(),
         'start_pos_y': 140,
         'min_offset_x': 40,
         'align': ALIGN.CENTER,
     },
     MAX_TEXT_WIDTH: {
-        'image': Image.open('pictures/big.jpg'),
+        'image': Image.open('pictures/big.jpg').copy(),
         'start_pos_y': 140,
         'min_offset_x': 40,
         'align': ALIGN.CENTER,
@@ -53,7 +54,7 @@ def up_and_dot(title):
     return title
 
 
-def generate_image(lines, sign=None, title=None, result_file=None):
+def generate_image(lines, sign=None, title=None, show=False):
     widths = [_draw.textsize(line, font=_common_font)[0] for line in lines]
     max_width = max(widths)
     for size in sorted(TEMPLATES.keys()):
@@ -92,7 +93,9 @@ def generate_image(lines, sign=None, title=None, result_file=None):
         y -= 40
         draw.text((min_offset_x, y), sign + u' ©', COMMON_COLOR, font=_sign_font)
 
-    if result_file:
-        img.save(result_file)
+    if not show:
+        b_arr = io.BytesIO()
+        img.save(b_arr, format='PNG')
+        return b_arr.getvalue()
     else:
         img.show()

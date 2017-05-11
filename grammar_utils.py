@@ -3,7 +3,7 @@
 import re
 import pymorphy2
 
-_g_MorphAnalyzer = pymorphy2.MorphAnalyzer()
+_g_MorphAnalyzer = None
 _g_norm_cache = {}
 _INVALID_CHARS = re.compile(ur'[^a-zA-Zа-яА-Я0-9]', re.UNICODE)
 _RUSSIAN_VOWELS_RE = re.compile(ur'[ауоыиэяюёе]', re.UNICODE)
@@ -104,6 +104,9 @@ def try_normalize_word(word):
     if res is not None:
         return res
 
+    global _g_MorphAnalyzer
+    if _g_MorphAnalyzer is None:
+        _g_MorphAnalyzer = pymorphy2.MorphAnalyzer()
     parse_results = _g_MorphAnalyzer.parse(word)
     if not parse_results:
         return word, ''

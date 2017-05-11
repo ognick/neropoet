@@ -6,5 +6,6 @@ settings = {
     'similarity_threshold': 0.3,
     'logging_level': 'INFO',
     'auto_reply_delay': 172800,
+    'processes': 4
 }
 settings.update(credentials)

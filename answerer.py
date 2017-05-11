@@ -2,11 +2,12 @@
 # -*- coding: utf-8
 
 
-import time
-import sys
+import time, sys
+from functools import partial
 from logging import getLogger
-import requests
-import json
+from multiprocessing import Pool
+import requests, json
+
 import vk
 from settings import settings
 from sys_utilst import load, save
@@ -44,11 +45,8 @@ def get_all_items(max_count_per_request, getter):
 
 
 def send_image(api, user_id, sign, post, title):
-    # if user_id not in settings['tester_ids']:
-    #     return
-
-    generate_image(post, sign=sign, title=title, result_file='img.jpg')
-    img = {'photo': ('img.png', open(r'img.jpg', 'rb'))}
+    img = generate_image(post, sign=sign, title=title)
+    img = {'photo': ('img.png', img)}
     upload_url = api.photos.getMessagesUploadServer()['upload_url']
     response = json.loads(requests.post(upload_url, files=img).text)
 
@@ -61,17 +59,59 @@ def send_image(api, user_id, sign, post, title):
     time.sleep(settings['sleep'])
 
 
-def answer(source_file_name):
-    try:
-        used_cache = load('used_cache.bin')
-    except IOError:
-        used_cache = {}
-
+def build_blocks(source_file_name, followers, message):
     data = load(source_file_name)
     mask_to_sentences = data['mask_to_sentences']
     matched_masks = data['matched_masks']
     system = RHYME_SYSTEM.CAKE
 
+    message = message['message']
+    user_id = message['user_id']
+    init_sign = followers.get(user_id)
+    if not init_sign:
+        return False, (user_id, NOT_FOLLOW_MSG)
+
+    words = normalize_sentence(message['body'])
+    logger.info('words %s' % ' '.join(words))
+    good_words = set([w for w in words if in_vocab(w)])
+    if not (0 < len(good_words) < 3):
+        return False, (user_id, BAD_WORDS_MSG)
+
+    title = ' '.join(good_words)
+    logger.info('good words %s' % title)
+    blocks = build(mask_to_sentences, matched_masks, system, good_words)
+    if not blocks:
+        return False, (user_id, NO_BLOCKS_MSG)
+
+    return True, (user_id, blocks, title)
+
+
+def get_best_block(used_cache, followers, user_id, blocks):
+    curr_time = int(time.time())
+    _, curr_user_cache = used_cache.setdefault(user_id, (curr_time, set()))
+    for block in blocks:
+        post = [sentence['text'] for sentence in block]
+
+        s_post = set(post)
+        if curr_user_cache & s_post:
+            continue
+
+        authors = {user_id} | set(settings['tester_ids'])
+        for sentence in block:
+            author_id = sentence['user_id']
+            if author_id in followers:
+                last_time, user_cache = used_cache.setdefault(author_id, (0, set()))
+                reply_delay = curr_time - last_time
+                if not (user_cache & s_post) and  reply_delay > settings['auto_reply_delay']:
+                    authors.add(author_id)
+
+        authors |= set(settings['tester_ids'])
+        return True, (authors, post)
+
+    return False, NO_BLOCKS_MSG
+
+
+def loop(source_file_name):
     session = vk.Session(settings['group_token'])
     api = vk.API(session, lang='ru', v='5.64')
 
@@ -86,77 +126,48 @@ def answer(source_file_name):
         lambda **kwargs : api.messages.getDialogs(unanswered=1, preview_length=20, **kwargs)
     )
 
-    curr_time = int(time.time())
-    for item in messages:
-        msg = item['message']
-        init_user_id = msg['user_id']
+    if not messages:
+        return 0
 
-        # if user_id not in settings['tester_ids']:
-        #     continue
+    try:
+        used_cache = load('used_cache.bin')
+    except IOError:
+        used_cache = {}
 
-        init_sign = followers.get(init_user_id)
-        if not init_sign:
-            api.messages.send(user_id=init_user_id, message=NOT_FOLLOW_MSG)
+    pool = Pool(processes=settings['processes'])
+    results = pool.map(partial(build_blocks, source_file_name, followers), messages)
+    for is_ok, result in results:
+        if not is_ok:
+            user_id, message = result
+            api.messages.send(user_id=user_id, message=message)
             time.sleep(settings['sleep'])
             continue
 
-        words = normalize_sentence(msg['body'])
-        logger.info('words %s' % ' '.join(words))
-        good_words = set([w for w in words if in_vocab(w)])
-        if len(good_words) != 1:
-            api.messages.send(user_id=init_user_id, message=BAD_WORDS_MSG)
+        user_id, blocks, title = result
+        is_ok, result = get_best_block(used_cache, followers, user_id, blocks)
+        if not is_ok:
+            api.messages.send(user_id=user_id, message=result)
             time.sleep(settings['sleep'])
             continue
 
-        title = ' '.join(good_words)
-        logger.info('good words %s' % title)
-        blocks = build(mask_to_sentences, matched_masks, system, good_words)
-        if not blocks:
-            api.messages.send(user_id=init_user_id, message=NO_BLOCKS_MSG)
-            time.sleep(settings['sleep'])
-            continue
-
-        _, curr_user_cache = used_cache.setdefault(init_user_id, (curr_time, set()))
-        while blocks:
-            block = blocks.pop(0)
-            post = []
-            is_author = {init_user_id: True}
-
-            for sentence in block:
-                post.append(sentence['text'])
-                author_id = sentence['user_id']
-                if author_id in followers:
-                    is_author[author_id] = True
-
-            s_post = set(post)
-            if curr_user_cache & s_post:
+        curr_time = int(time.time())
+        user_ids, post = result
+        s_post = set(post)
+        for u_id in user_ids:
+            is_tester = user_id not in settings['tester_ids']
+            sign = followers[user_id if is_tester else u_id]
+            try:
+                _, user_cache = used_cache.setdefault(u_id, (curr_time, set()))
+                send_image(api, u_id, sign, post, title)
+                if not is_tester:
+                    used_cache[u_id] = (curr_time, user_cache | s_post)
+                    save(used_cache, 'used_cache.bin')
+                logger.info('send to %s' % followers[u_id])
+            except vk.exceptions.VkAPIError as error:
+                logger.error('send to %s %s' % (sign, error.message))
                 continue
-
-            is_author.update({uid: False for uid in settings['tester_ids']})
-            for user_id, is_cached in is_author.iteritems():
-                if is_cached:
-                    last_time, user_cache = used_cache.setdefault(user_id, (0, set()))
-                    if (init_user_id != user_id) and \
-                            ((user_cache & s_post) or
-                                curr_time - last_time < settings['auto_reply_delay']):
-                        continue
-                try:
-                    sign = followers[user_id] if is_cached else init_sign
-                    send_image(api, user_id, sign, post, title)
-                    if is_cached:
-                        used_cache[user_id] = (curr_time, user_cache | s_post)
-                        save(used_cache, 'used_cache.bin')
-                    logger.info('send to %s' % sign)
-                except vk.exceptions.VkAPIError as error:
-                    logger.error('send to %s %s' %(sign, error.message))
-                    continue
-            break
-        else:
-            api.messages.send(user_id=init_user_id, message=NO_BLOCKS_MSG)
-            time.sleep(settings['sleep'])
-
     return 0
 
 
 if __name__ == '__main__':
-    sys.exit(answer(sys.argv[1]))
+    sys.exit(loop(sys.argv[1]))

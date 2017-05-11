@@ -1,0 +1,7 @@
+datasets/*.bin
+*/*.bin
+credentials.py
+*.pyc
+.idea
+*.jpg
+.DS_Store
