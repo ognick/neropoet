@@ -4,7 +4,7 @@ import time
 import sched
 import sys
 
-    from multiprocessing import Process
+from multiprocessing import Process
 from logging import getLogger
 from sys_utilst import is_exists
 
