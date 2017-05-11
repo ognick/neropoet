@@ -6,6 +6,7 @@ import sys
 
 from multiprocessing import Process
 from logging import getLogger
+from settings import settings
 from sys_utilst import is_exists
 
 logger = getLogger('autorun')
@@ -26,8 +27,8 @@ ACTION_NAMES = dict(
 
 
 DELAY = {
-    ACTION.ANSWER: 10,
-    ACTION.RELOAD: 60 * 20,
+    ACTION.ANSWER: settings['answer'],
+    ACTION.RELOAD: settings['reload'],
 }
 
 
