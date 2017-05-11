@@ -173,8 +173,9 @@ def download(start_id, end_id):
     except KeyboardInterrupt:
         worker.terminate()
 
-    save(data, add_postfix(dump_file_name, 'ext'))
-    logger.info('Done %d sentences.' % total_count)
+    if task_queue.empty():
+        save(data, add_postfix(dump_file_name, 'ext'))
+        logger.info('Done %d sentences.' % total_count)
 
 
 if __name__ == '__main__':
