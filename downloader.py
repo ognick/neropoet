@@ -170,13 +170,12 @@ def download(start_id, end_id):
                 if time.time() - last_save_time > 5.0:
                     last_save_time = time.time()
                     save(data, add_postfix(dump_file_name, 'tmp'))
-    except KeyboardInterrupt:
-        worker.terminate()
 
-    if task_queue.empty():
         save(data, add_postfix(dump_file_name, 'ext'))
         logger.info('Done %d sentences.' % total_count)
 
+    except KeyboardInterrupt:
+        worker.terminate()
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:

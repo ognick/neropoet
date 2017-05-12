@@ -35,14 +35,15 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
 
     similarities = {}
     all_masks = matched_masks.keys()
-    logger.info('matching key words. %d masks' % len(all_masks))
     bar = get_bar(max_value=len(all_masks))
+    total_num = good_num = 0
     for mi, mask in enumerate(all_masks):
         sentences = []
         for m in matched_masks[mask]:
             sentences.extend(mask_to_sentences[m])
 
         for i, s1 in enumerate(sentences):
+            total_num += 1
             if ln1 and abs(s1['length'] - ln1) > d1:
                 continue
 
@@ -53,8 +54,8 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
             s1['similar'] = similar1
             last_word_s1 = s1['last_word']
             cur_similarities = {}
-            similarities.setdefault(similar1, []).append(
-                (s1, cur_similarities))
+            similarities.setdefault(similar1, []).append((s1, cur_similarities))
+            good_num += 1
 
             for j in xrange(0, len(sentences)):
                 s2 = sentences[j]
@@ -79,12 +80,11 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
                 s2['similar'] = similar2
 
                 cur_similarities.setdefault(similar2, []).append(s2)
-
         bar.update(mi)
-    logger.info('matching key words done.')
+
+    logger.info('matching key words %d/%d done.' % (good_num, total_num))
 
     pairs = []
-    logger.info('joining flatten list.')
     for sim1 in sorted(similarities.keys(), reverse=True):
         for s1, sim2_to_words in similarities[sim1]:
             for sim2 in sorted(sim2_to_words.keys(), reverse=True):
@@ -115,7 +115,6 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
                 g_used.add(p['norm'])
 
     blocks = []
-    logger.info('building blocks.')
     rt1, rt2 = unique_types
     for i, pair1 in enumerate(pairs):
         if len(blocks) >= settings['max_block_count']:

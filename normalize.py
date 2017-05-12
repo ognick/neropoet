@@ -19,7 +19,7 @@ def get_normal_sentences(post):
     for c in frozenset([' - ']):
         text = text.replace(c, '|')
 
-    sentences = [s for s in text.split('|') if has_russian_chars(s) and 0 < len(s) < 12]
+    sentences = [s for s in text.split('|') if has_russian_chars(s) and 0 < len(s) < 40]
     long_sentences = []
     for pos, sentence in enumerate(sentences):
         if get_length(sentence) < 6:
