@@ -57,7 +57,16 @@ def up_and_dot(title):
     return title
 
 
+def check_dot(line):
+    sentence = list(line)
+    if sentence[-1] == ',':
+        sentence[-1] = '.'
+        return ''.join(sentence)
+    return line
+
+
 def generate_image(lines, sign=None, title=None, show=False):
+    lines[-1] = check_dot(lines[-1])
     widths = [_draw.textsize(line, font=_common_font)[0] for line in lines]
     max_width = max(widths)
     for size in sorted(TEMPLATES.keys()):

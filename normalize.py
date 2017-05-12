@@ -32,7 +32,9 @@ def get_normal_sentences(post):
     norm_sentences = []
     for sentence in set(sentences + long_sentences):
         sentence = sentence.strip()
-        sentence = sentence[0].upper() + sentence[1:]
+        sentence = list(sentence)
+        sentence[0] = sentence[0].upper()
+        sentence = ''.join(sentence)
         sentence = ' '.join(sentence.split())
         if sentence[-1] not in ENDS:
             sentence += '.'
