@@ -1,3 +1,4 @@
+cython==0.24.1
 vk==2.0.2
 word2vec==0.9.1
 pymorphy2==0.8
