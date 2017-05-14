@@ -1,1 +1,1 @@
-web: python autorun.py
+web: python autorun.py 0 1000
