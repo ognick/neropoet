@@ -1,5 +1,5 @@
 numpy==1.9.2
-Cython>=0.21.1
+Cython>=0.25.2
 vk==2.0.2
 word2vec==0.9.1
 pymorphy2==0.8
