@@ -24,13 +24,13 @@ try:
     import os
     env = os.environ
     settings.update({
-        'group_token': env.get('group_token'),
+        'group_token': env['group_token'],
         'bot_auth' : {
-            'app_id': env.get('app_id'),
-            'user_login': env.get('user_login'),
-            'user_password': env.get('user_password'),
+            'app_id': env['app_id'],
+            'user_login': env['user_login'],
+            'user_password': env['user_password'],
         },
     })
 except:
-    pass
+    raise
 
