@@ -18,19 +18,18 @@ try:
     from credentials import credentials
     settings.update(credentials)
 except ImportError:
-    pass
-
-try:
-    import os
-    env = os.environ
-    settings.update({
-        'group_token': env['group_token'],
-        'bot_auth' : {
-            'app_id': env['app_id'],
-            'user_login': env['user_login'],
-            'user_password': env['user_password'],
-        },
-    })
-except:
-    raise
+    try:
+        import os
+        env = os.environ
+        settings.update({
+            'group_token': env['group_token'],
+            'app_token': env['app_token'],
+            'bot_auth' : {
+                'app_id': env['app_id'],
+                'user_login': env['user_login'],
+                'user_password': env['user_password'],
+            },
+        })
+    except:
+        raise
 
