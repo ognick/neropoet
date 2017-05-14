@@ -1,6 +1,6 @@
 numpy>=1.9.2
 cython
-vk==2.0.2
+vk
 pymorphy2==0.8
 progressbar2==3.20.0
 pillow==3.3.1
