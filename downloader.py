@@ -12,7 +12,6 @@ import vk
 from settings import settings
 from sys_utilst import save, get_bar, add_postfix
 
-vk.logger.setLevel('DEBUG')
 logger = getLogger(__name__)
 
 
