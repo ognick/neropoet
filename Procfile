@@ -1,1 +1,1 @@
-web: python autorun.py 0 1000
+urgentworker: python autorun.py 0 1000
