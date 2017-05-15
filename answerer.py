@@ -155,7 +155,7 @@ def loop(source_file_name):
         user_ids, post = result
         s_post = set(post)
         for u_id in user_ids:
-            is_tester = user_id not in settings['tester_ids']
+            is_tester = u_id in settings['tester_ids']
             sign = followers[user_id if is_tester else u_id]
             try:
                 _, user_cache = used_cache.setdefault(u_id, (curr_time, set()))
