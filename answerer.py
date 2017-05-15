@@ -101,7 +101,7 @@ def get_best_block(used_cache, followers, user_id, blocks):
         for sentence in block:
             author_id = sentence['user_id']
             if author_id in followers:
-                last_time, user_cache = used_cache.setdefault(author_id, (0, set()))
+                last_time, user_cache = used_cache.setdefault(author_id, (curr_time, set()))
                 reply_delay = curr_time - last_time
                 if not (user_cache & s_post) and reply_delay > settings['auto_reply_delay']:
                     authors.add(author_id)
