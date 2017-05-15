@@ -6,7 +6,7 @@ settings = {
     'similarity_threshold': 0.3,
     'logging_level': 'INFO',
     'auto_reply_delay': 172800,
-    'processes': 4,
+    'processes': 1,
     'answer': 10,
     'reload': 1200,
 
@@ -29,6 +29,7 @@ except ImportError:
                 'user_login': env['user_login'],
                 'user_password': env['user_password'],
             },
+            'processes' : int(env.get('processes', settings['processes'])),
         })
     except:
         raise
