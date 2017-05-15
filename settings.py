@@ -12,6 +12,8 @@ settings = {
 
     'blacklist': [349746767],
     'tester_ids': [4294291],
+
+    'style': 'random',
 }
 
 try:

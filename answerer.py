@@ -2,7 +2,7 @@
 # -*- coding: utf-8
 
 
-import time, sys
+import time, sys, os
 from functools import partial
 from logging import getLogger
 from multiprocessing import Pool
@@ -63,8 +63,14 @@ def build_blocks(source_file_name, followers, message):
     data = load(source_file_name)
     mask_to_sentences = data['mask_to_sentences']
     matched_masks = data['matched_masks']
-    system = RHYME_SYSTEM.CAKE
 
+    rs_name = os.environ.get('style', settings.get('style', 'random')).upper()
+    system = getattr(RHYME_SYSTEM, rs_name, None)
+    if system is None:
+        from random import choice
+        rs_name, system = choice([(k, v) for k, v in RHYME_SYSTEM.__dict__.iteritems() if '_' not in k])
+
+    print rs_name, system
     message = message['message']
     user_id = message['user_id']
     init_sign = followers.get(user_id)
@@ -72,7 +78,7 @@ def build_blocks(source_file_name, followers, message):
         return False, (user_id, NOT_FOLLOW_MSG)
 
     words = normalize_sentence(message['body'])
-    logger.info('words %s' % ' '.join(words))
+    logger.info('%s words %s' % (rs_name, ' '.join(words)))
     good_words = set([w for w in words if in_vocab(w)])
     if not (0 < len(good_words) < 3):
         return False, (user_id, BAD_WORDS_MSG)

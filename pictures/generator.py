@@ -59,7 +59,7 @@ def up_and_dot(title):
 
 def check_dot(line):
     sentence = list(line)
-    if sentence[-1] == ',':
+    if sentence[-1] in ',:':
         sentence[-1] = '.'
         return ''.join(sentence)
     return line

@@ -151,7 +151,7 @@ def main():
     data = load(file_name)
     mask_to_sentences = data['mask_to_sentences']
     matched_masks = data['matched_masks']
-    system = RHYME_SYSTEM.CAKE
+    system = RHYME_SYSTEM.PLAIN6
     init_words = [w.decode('utf-8') for w in sys.argv[2:]]
     blocks = build(mask_to_sentences, matched_masks, system, init_words)
     for block in blocks:

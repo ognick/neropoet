@@ -46,13 +46,20 @@ for k, v in RHYME_TYPE.__dict__.iteritems():
 
 
 class RHYME_SYSTEM:
-    PLAIN = 'A A B B'
-    INTERLACED = 'A B A B'
-    ENCLOSING = 'A B B A'
-    CROSSED = 'A B C A B C'
-    CUSTOM = 'M:10:2 F:10:2 M:10:2 F:10:2'
-    SIMPLE1 = 'A:8:2 A:8:2 B:8:2 B:8:2'
-    CAKE = 'A:8:1 A:8:1 B:8:1 B:8:1'
+    # PLAIN = 'A A B B'
+    # INTERLACED = 'A B A B'
+    # ENCLOSING = 'A B B A'
+    # CROSSED = 'A B C A B C'
+    # CUSTOM = 'M:10:2 F:10:2 M:10:2 F:10:2'
+    PLAIN6 = 'A:6 A:6 B:6 B:6'
+    PLAIN7 = 'A:7 A:7 B:7 B:7'
+    PLAIN8 = 'A:8 A:8 B:8 B:8'
+
+    INTERLACED6 = 'A:6 B:6 A:6 B:6'
+    INTERLACED7 = 'A:7 B:7 A:7 B:7'
+    INTERLACED8 = 'A:8 B:8 A:8 B:8'
+
+
 
 
 def detect_rhyme_type(mask):
