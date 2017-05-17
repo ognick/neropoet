@@ -5,7 +5,7 @@ import pymorphy2
 
 _g_MorphAnalyzer = None
 _g_norm_cache = {}
-_INVALID_CHARS = re.compile(ur'[^a-zA-Zа-яА-Я0-9]', re.UNICODE)
+_INVALID_CHARS = re.compile(ur'[^a-zA-Zа-яёЁА-Я0-9]', re.UNICODE)
 _RUSSIAN_VOWELS_RE = re.compile(ur'[ауоыиэяюёе]', re.UNICODE)
 
 VOWELS = set(u'аёеиоуэыюяaeioquy')
