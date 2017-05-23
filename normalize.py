@@ -56,7 +56,11 @@ def get_normal_sentences(post):
         if not mask:
             continue
 
-        key_words = extract_key_words(words)
+        last_word, morphy_tag = try_normalize_word(last_word)
+        if not morphy_tag:
+            continue
+
+        key_words = extract_key_words([try_normalize_word(w)[0] for w in words])
         if not key_words:
             continue
 
@@ -64,12 +68,13 @@ def get_normal_sentences(post):
         newItem.update({
             'text': sentence,
             'id': '%s-%d' % (post['id'], i),
-            'words': normalize_sentence(sentence),
+            'words': words,
             'norm': norm,
             'length': length,
             'last_word': last_word,
             'mask': mask,
             'key_words': key_words,
+            'morphy_tag': morphy_tag,
         })
         sentences.append(newItem)
 

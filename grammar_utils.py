@@ -109,13 +109,9 @@ def try_normalize_word(word):
         _g_MorphAnalyzer = pymorphy2.MorphAnalyzer()
     parse_results = _g_MorphAnalyzer.parse(word)
     if not parse_results:
-        return word, ''
+        return word, frozenset()
 
-    res = (parse_results[0].normal_form, parse_results[0].tag)
+    res = (parse_results[0].normal_form, parse_results[0].tag.grammemes)
     _g_norm_cache[word] = res
 
     return res
-
-
-def is_conjugate_words(word1, word2):
-    return try_normalize_word(word1)[0] == try_normalize_word(word2)[0]

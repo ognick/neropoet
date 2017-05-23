@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 
 def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
     from w2v_model import in_vocab, n_similarity
-    init_words = set([w for w in init_words if in_vocab(w)])
+    init_words = set([w for w in init_words if in_vocab(try_normalize_word(w)[0])])
     if not init_words:
         logger.error('init words there are not in vocab')
         return []
@@ -60,6 +60,9 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
             for j in xrange(0, len(sentences)):
                 s2 = sentences[j]
 
+                if ('VERB' in s1['morphy_tag']) and ('VERB' in s2['morphy_tag']):
+                    continue
+
                 if ln2 and abs(s2['length'] - ln2) > d2:
                     continue
 
@@ -68,9 +71,6 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
                     continue
 
                 if WORD_TO_GROUP.get(last_word_s1, 0) == WORD_TO_GROUP.get(last_word_s2, 1):
-                    continue
-
-                if is_conjugate_words(last_word_s1, last_word_s2):
                     continue
 
                 similar2, s2['best_word'] = _get_nearest_word(s2)
