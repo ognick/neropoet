@@ -53,6 +53,7 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
 
             s1['similar'] = similar1
             last_word_s1 = s1['last_word']
+            norm_last_word_s1 = s1['norm_last_word']
             cur_similarities = {}
             similarities.setdefault(similar1, []).append((s1, cur_similarities))
             good_num += 1
@@ -60,7 +61,10 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
             for j in xrange(0, len(sentences)):
                 s2 = sentences[j]
 
-                if ('VERB' in s1['morphy_tag']) and ('VERB' in s2['morphy_tag']):
+                if norm_last_word_s1 == s2['norm_last_word']:
+                    continue
+
+                if (VERBS & s1['morphy_tag']) and (VERBS & s2['morphy_tag']):
                     continue
 
                 if ln2 and abs(s2['length'] - ln2) > d2:
@@ -101,11 +105,11 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
             return False
 
         for p in pair:
-            if p['norm'] in g_used or p['last_word'] in l_used or p['best_word'] in l_used:
+            if p['norm'] in g_used or p['norm_last_word'] in l_used or p['best_word'] in l_used:
                 return False
 
         for p in pair:
-            l_used.add(p['last_word'])
+            l_used.add(p['norm_last_word'])
             l_used.add(p['best_word'])
         return True
 

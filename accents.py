@@ -25,6 +25,8 @@ def _load_accent_books():
                     acc = line.index('`')
                     line = line.replace('`', '')
                     if line in _g_accents:
+                        if _g_accents[line] != acc:
+                            _g_accents[line] = None
                         continue
                     _g_accents[line] = acc
 

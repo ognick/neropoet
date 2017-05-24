@@ -1,3 +1,6 @@
+#!/usr/bin/env python2.7
+# -*- coding: utf-8
+
 from logging import getLogger
 from rhyme import get_rhyme_mask
 from w2v_model import extract_key_words
@@ -56,8 +59,8 @@ def get_normal_sentences(post):
         if not mask:
             continue
 
-        last_word, morphy_tag = try_normalize_word(last_word)
-        if not morphy_tag:
+        norm_last_word, morphy_tag = try_normalize_word(last_word)
+        if not morphy_tag or bool(NPRO & morphy_tag):
             continue
 
         key_words = extract_key_words([try_normalize_word(w)[0] for w in words])
@@ -72,6 +75,7 @@ def get_normal_sentences(post):
             'norm': norm,
             'length': length,
             'last_word': last_word,
+            'norm_last_word': norm_last_word,
             'mask': mask,
             'key_words': key_words,
             'morphy_tag': morphy_tag,
@@ -79,3 +83,6 @@ def get_normal_sentences(post):
         sentences.append(newItem)
 
     return sentences
+
+if __name__ == '__main__':
+    pass

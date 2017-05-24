@@ -37,7 +37,7 @@ BAD_ENDINGS = {
     u'бы', u'же', u'на', u'ну',
     u'того', u'том', u'его', u'нет',
     u'но', u'всё', u'все', u'да', u'ему',
-    u'то',
+    u'то', u'чем', u'всем',
 }
 
 ENDS = frozenset('.,:?!)')
@@ -77,6 +77,10 @@ SIMILAR_COMBINATIONS = {
     u'о': (u'a',), u'a': (u'о',),
     u'е': (u'и'), u'и': (u'е', u'ой'), u'ой': (u'и'),
 }
+
+
+VERBS = frozenset(['VERB', 'INFN'])
+NPRO = frozenset(['NPRO'])
 
 
 def convert_numbers(text):
