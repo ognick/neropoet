@@ -71,7 +71,6 @@ def filtered_string(line):
 
 def generate_image(lines, sign=None, title=None, show=False):
     lines = [filtered_string(l) for l in lines]
-    print lines
     lines[-1] = check_dot(lines[-1])
     widths = [_draw.textsize(line, font=_common_font)[0] for line in lines]
     max_width = max(widths)

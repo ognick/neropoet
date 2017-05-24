@@ -70,7 +70,7 @@ def build_blocks(source_file_name, followers, message):
         from random import choice
         rs_name, system = choice([(k, v) for k, v in RHYME_SYSTEM.__dict__.iteritems() if '_' not in k])
 
-    print rs_name, system
+    logger.info('%s: %s' % (rs_name, system))
     message = message['message']
     user_id = message['user_id']
     init_sign = followers.get(user_id)
