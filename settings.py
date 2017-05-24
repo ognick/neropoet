@@ -5,9 +5,12 @@ settings = {
     'sleep': 0.30,
     'similarity_threshold': 0.3,
     'logging_level': 'INFO',
+    'spam_mode': False,
     'auto_reply_delay': 172800,
     'processes': 1,
-    'answer': 10,
+    'is_tmp_file': False,
+
+    'answer': 1,
     'reload': 1200,
 
     'blacklist': [349746767],
@@ -31,8 +34,10 @@ except ImportError:
                 'user_login': env['user_login'],
                 'user_password': env['user_password'],
             },
-            'processes' : int(env.get('processes', settings['processes'])),
         })
+        for name in ['processes', 'answer', 'reload']:
+            if name in env:
+                settings[name] = int(env[name])
     except:
         raise
 

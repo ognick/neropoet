@@ -104,13 +104,14 @@ def get_best_block(used_cache, followers, user_id, blocks):
             continue
 
         authors = {user_id} | set(settings['tester_ids'])
-        for sentence in block:
-            author_id = sentence['user_id']
-            if author_id in followers:
-                last_time, user_cache = used_cache.setdefault(author_id, (curr_time, set()))
-                reply_delay = curr_time - last_time
-                if not (user_cache & s_post) and reply_delay > settings['auto_reply_delay']:
-                    authors.add(author_id)
+        if settings['spam_mode']:
+            for sentence in block:
+                author_id = sentence['user_id']
+                if author_id in followers:
+                    last_time, user_cache = used_cache.setdefault(author_id, (curr_time, set()))
+                    reply_delay = curr_time - last_time
+                    if not (user_cache & s_post) and reply_delay > settings['auto_reply_delay']:
+                        authors.add(author_id)
 
         authors |= set(settings['tester_ids'])
         return True, (authors, post)
@@ -166,13 +167,12 @@ def loop(source_file_name):
             try:
                 _, user_cache = used_cache.setdefault(u_id, (curr_time, set()))
                 send_image(api, u_id, sign, post, title)
-                if not is_tester:
-                    used_cache[u_id] = (curr_time, user_cache | s_post)
-                    save(used_cache, 'used_cache.bin')
+                used_cache[u_id] = (curr_time, user_cache | s_post)
                 logger.info('send to %s' % followers[u_id])
             except vk.exceptions.VkAPIError as error:
                 logger.error('send to %s %s' % (sign, error.message))
                 continue
+        save(used_cache, 'used_cache.bin')
     return 0
 
 

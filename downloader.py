@@ -166,7 +166,7 @@ def download(start_id, end_id):
                                 new_mask, set()).add(old_mask)
                             matched_masks[old_mask].add(new_mask)
 
-                if time.time() - last_save_time > 5.0:
+                if settings['is_tmp_file'] and time.time() - last_save_time > 5.0:
                     last_save_time = time.time()
                     save(data, add_postfix(dump_file_name, 'tmp'))
 

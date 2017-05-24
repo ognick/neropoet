@@ -50,9 +50,7 @@ def reschedule(f):
 def do_answer():
     if is_exists(file_name):
         from answerer import loop
-        worker = Process(target=loop, args=(file_name, ))
-        worker.run()
-
+        loop(file_name)
 
 @reschedule
 def do_reload():

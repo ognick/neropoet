@@ -120,6 +120,7 @@ def generate_image(lines, sign=None, title=None, show=False):
     else:
         img.show()
 
+
 if __name__ == '__main__':
     lines = [u'флыд##    во ajkdl{}[](@"-")KJLK%&', u'1!?!?__\'_!?!?!13241', u'dsfsd))))))sdfs))']
     lines.append(u'я' * 32)
