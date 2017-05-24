@@ -1,9 +1,8 @@
 # -*- coding: utf-8
 
-import io
+import io, string, re
 from PIL import Image, ImageFont, ImageDraw
 from settings import settings
-
 
 class ALIGN:
     LEFT = 1
@@ -17,6 +16,7 @@ COMMON_FONT_SIZE = 50
 SIGN_FONT_SIZE = 34
 MAX_TEXT_WIDTH = 2000
 
+PRINTABLE = u"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" + string.printable
 
 TEMPLATES = {
     700 : {
@@ -52,7 +52,7 @@ def up_and_dot(title):
     title = title.strip()
     title = title[0].upper() + title[1:]
     title = ' '.join(title.split())
-    if title[-1] not in '!?).':
+    if title[-1] not in '!?.:':
         title += '.'
     return title
 
@@ -65,7 +65,13 @@ def check_dot(line):
     return line
 
 
+def filtered_string(line):
+    return filter(lambda x: x in PRINTABLE, re.sub('\s{2,}', ' ', line))
+
+
 def generate_image(lines, sign=None, title=None, show=False):
+    lines = [filtered_string(l) for l in lines]
+    print lines
     lines[-1] = check_dot(lines[-1])
     widths = [_draw.textsize(line, font=_common_font)[0] for line in lines]
     max_width = max(widths)
@@ -88,7 +94,6 @@ def generate_image(lines, sign=None, title=None, show=False):
         w = _draw.textsize(title, font=_common_font)[0]
         x = (max_text_width - w) / 2 - left_offset_x
         draw.text((x, 60), up_and_dot(title), COMMON_COLOR, font=_common_font)
-
 
     for i, line in enumerate(lines):
         y = template['start_pos_y'] + i * LINE_DISTANCE
@@ -117,6 +122,6 @@ def generate_image(lines, sign=None, title=None, show=False):
         img.show()
 
 if __name__ == '__main__':
-    lines = [u'Ё' * 30]*3
+    lines = [u'флыд##    во ajkdl{}[](@"-")KJLK%&', u'1!?!?__\'_!?!?!13241', u'dsfsd))))))sdfs))']
     lines.append(u'я' * 32)
     generate_image(lines, sign='Ogneslav Arlovsky', title='Title', show=True)

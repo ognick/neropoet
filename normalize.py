@@ -34,6 +34,9 @@ def get_normal_sentences(post):
 
     norm_sentences = []
     for sentence in set(sentences + long_sentences):
+        if set('#_') & set(sentence):
+            continue
+
         sentence = sentence.strip()
         sentence = list(sentence)
         sentence[0] = sentence[0].upper()
