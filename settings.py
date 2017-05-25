@@ -10,7 +10,7 @@ settings = {
     'processes': 1,
     'is_tmp_file': False,
 
-    'answer': 1,
+    'answer': 10,
     'reload': 1200,
 
     'blacklist': [349746767],

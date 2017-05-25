@@ -170,7 +170,7 @@ def loop(source_file_name):
                 used_cache[u_id] = (curr_time, user_cache | s_post)
                 logger.info('send to %s' % followers[u_id])
             except vk.exceptions.VkAPIError as error:
-                logger.error('send to %s %s' % (sign, error.message))
+                logger.error('send to %s %s' % (followers[u_id], error.message))
                 continue
         save(used_cache, 'used_cache.bin')
     return 0
