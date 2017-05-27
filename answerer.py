@@ -80,10 +80,10 @@ def build_blocks(source_file_name, followers, message):
     words = normalize_sentence(message['body'])
     logger.info('%s words %s' % (rs_name, ' '.join(words)))
     good_words = set([w for w in words if in_vocab(w)])
-    if not (0 < len(good_words) < 3):
+    if not (0 < len(good_words) < 5):
         return False, (user_id, BAD_WORDS_MSG)
 
-    title = ' '.join(good_words)
+    title = ' '.join(words)
     logger.info('good words %s' % title)
     blocks = build(mask_to_sentences, matched_masks, system, good_words)
     if not blocks:

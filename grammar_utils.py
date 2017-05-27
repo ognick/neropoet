@@ -81,6 +81,8 @@ SIMILAR_COMBINATIONS = {
 
 VERBS = frozenset(['VERB', 'INFN'])
 NPRO = frozenset(['NPRO'])
+ADJF = frozenset(['ADJF'])
+BAD_END_TAGS = NPRO | ADJF
 
 
 def convert_numbers(text):

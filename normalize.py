@@ -54,7 +54,7 @@ def get_normal_sentences(post):
             continue
 
         norm_last_word, morphy_tag = try_normalize_word(last_word)
-        if not morphy_tag or bool(NPRO & morphy_tag):
+        if not morphy_tag or bool(BAD_END_TAGS & morphy_tag):
             continue
 
         key_words = extract_key_words([try_normalize_word(w)[0] for w in words])
