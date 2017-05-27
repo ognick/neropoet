@@ -169,6 +169,8 @@ def loop(source_file_name):
         for u_id in user_ids:
             is_tester = u_id in settings['tester_ids']
             sign = followers[user_id if is_tester else u_id]
+            if is_tester and user_id == user_id:
+                sign = None
             try:
                 _, user_cache = used_cache.setdefault(u_id, (curr_time, set()))
                 send_image(api, u_id, sign, post, title)
