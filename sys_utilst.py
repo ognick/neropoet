@@ -8,7 +8,6 @@ from settings import settings
 
 
 _FOLDER = os.path.abspath(os.path.dirname(__file__)) + '/datasets/'
-progressbar.streams.wrap_stderr()
 logging.basicConfig(
     format='%(asctime)s : %(module)s %(levelname)s : %(message)s',
     level=getattr(logging, settings.get(

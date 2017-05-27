@@ -23,17 +23,8 @@ def get_normal_sentences(post):
         text = text.replace(c, '|')
 
     sentences = [s for s in text.split('|') if has_russian_chars(s) and 0 < len(s) < 40]
-    long_sentences = []
-    for pos, sentence in enumerate(sentences):
-        if get_length(sentence) < 6:
-            if pos > 0:
-                long_sentences.append(sentences[pos - 1] + sentence)
-
-            if pos < len(sentences) - 2:
-                long_sentences.append(sentence + sentences[pos + 1])
-
     norm_sentences = []
-    for sentence in set(sentences + long_sentences):
+    for sentence in set(sentences):
         if set('#_') & set(sentence):
             continue
 

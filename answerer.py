@@ -99,8 +99,7 @@ def get_best_block(used_cache, followers, user_id, blocks):
         post = [sentence['text'] for sentence in block]
 
         s_post = set(post)
-        is_tester = user_id in settings['tester_ids']
-        if (not is_tester) and (curr_user_cache & s_post):
+        if curr_user_cache & s_post:
             continue
 
         authors = {user_id} | set(settings['tester_ids'])
@@ -142,8 +141,14 @@ def loop(source_file_name):
     except IOError:
         used_cache = {}
 
-    pool = Pool(processes=settings['processes'])
-    results = pool.map(partial(build_blocks, source_file_name, followers), messages)
+    build = partial(build_blocks, source_file_name, followers)
+    processes = settings['processes']
+    if processes > 1:
+        pool = Pool(processes=processes)
+        results = pool.map(build, messages)
+    else:
+        results = [build(msg) for msg in messages]
+
     for is_ok, result in results:
         if not is_ok:
             user_id, message = result
