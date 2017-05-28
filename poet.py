@@ -12,7 +12,7 @@ from grammar_utils import *
 logger = getLogger(__name__)
 
 
-def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
+def build(mask_to_sentences, matched_masks, rhyme_system, user_cache, init_words):
     from w2v_model import in_vocab, n_similarity
     init_words = set([w for w in init_words if in_vocab(try_normalize_word(w)[0])])
     if not init_words:
@@ -44,6 +44,10 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
 
         for i, s1 in enumerate(sentences):
             total_num += 1
+
+            if s1['norm'] in user_cache:
+                continue
+
             if ln1 and abs(s1['length'] - ln1) > d1:
                 continue
 
@@ -60,6 +64,9 @@ def build(mask_to_sentences, matched_masks, rhyme_system, init_words):
 
             for j in xrange(0, len(sentences)):
                 s2 = sentences[j]
+
+                if s2['norm'] in user_cache:
+                    continue
 
                 if norm_last_word_s1 == s2['norm_last_word']:
                     continue
@@ -157,7 +164,7 @@ def main():
     matched_masks = data['matched_masks']
     system = RHYME_SYSTEM.PLAIN6
     init_words = [w.decode('utf-8') for w in sys.argv[2:]]
-    blocks = build(mask_to_sentences, matched_masks, system, init_words)
+    blocks = build(mask_to_sentences, matched_masks, system, set(), init_words)
     for block in blocks:
         for line in block:
             print line['text']

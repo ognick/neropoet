@@ -59,7 +59,7 @@ def send_image(api, user_id, sign, post, title):
     time.sleep(settings['sleep'])
 
 
-def build_blocks(source_file_name, followers, message):
+def build_blocks(source_file_name, followers, used_cache, message):
     data = load(source_file_name)
     mask_to_sentences = data['mask_to_sentences']
     matched_masks = data['matched_masks']
@@ -85,7 +85,8 @@ def build_blocks(source_file_name, followers, message):
 
     title = ' '.join(words)
     logger.info('good words %s' % title)
-    blocks = build(mask_to_sentences, matched_masks, system, good_words)
+    _, user_cache = used_cache.get(None, set())
+    blocks = build(mask_to_sentences, matched_masks, system, user_cache, good_words)
     if not blocks:
         return False, (user_id, NO_BLOCKS_MSG)
 
@@ -128,12 +129,12 @@ def loop(source_file_name):
     )
     followers = {u['id']: '%s %s' % (u['first_name'], u['last_name']) for u in followers}
 
-    messages = get_all_items(
+    all_messages = get_all_items(
         MAX_MESSAGES_PER_REQUEST,
         lambda **kwargs : api.messages.getDialogs(unanswered=1, preview_length=20, **kwargs)
     )
 
-    if not messages:
+    if not all_messages:
         return 0
 
     try:
@@ -141,7 +142,22 @@ def loop(source_file_name):
     except IOError:
         used_cache = {}
 
-    build = partial(build_blocks, source_file_name, followers)
+    curr_time = int(time.time())
+    messages = []
+    for m in all_messages:
+        u_id = m['user_id']
+        if u_id not in settings['tester_ids'] or 'clear' not in m['message']:
+            messages.append(m)
+            continue
+
+        used_cache[u_id] = (curr_time, set())
+        try:
+            api.messages.send(user_id=u_id, message='done')
+        except vk.exceptions.VkAPIError as error:
+            logger.error('send to %s %s' % (followers[u_id], error.message))
+            continue
+
+    build = partial(build_blocks, source_file_name, followers, used_cache)
     processes = settings['processes']
     if processes > 1:
         pool = Pool(processes=processes)
@@ -163,7 +179,6 @@ def loop(source_file_name):
             time.sleep(settings['sleep'])
             continue
 
-        curr_time = int(time.time())
         user_ids, post = result
         s_post = set(post)
         for u_id in user_ids:
