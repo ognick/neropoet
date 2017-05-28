@@ -71,7 +71,6 @@ def build_blocks(source_file_name, followers, used_cache, message):
         rs_name, system = choice([(k, v) for k, v in RHYME_SYSTEM.__dict__.iteritems() if '_' not in k])
 
     logger.info('%s: %s' % (rs_name, system))
-    message = message['message']
     user_id = message['user_id']
     init_sign = followers.get(user_id)
     if not init_sign:
@@ -85,7 +84,7 @@ def build_blocks(source_file_name, followers, used_cache, message):
 
     title = ' '.join(words)
     logger.info('good words %s' % title)
-    _, user_cache = used_cache.get(None, set())
+    _, user_cache = used_cache.get(user_id, (None, set()))
     blocks = build(mask_to_sentences, matched_masks, system, user_cache, good_words)
     if not blocks:
         return False, (user_id, NO_BLOCKS_MSG)
@@ -145,9 +144,10 @@ def loop(source_file_name):
     curr_time = int(time.time())
     messages = []
     for m in all_messages:
-        u_id = m['user_id']
-        if u_id not in settings['tester_ids'] or 'clear' not in m['message']:
-            messages.append(m)
+        msg = m['message']
+        u_id = msg['user_id']
+        if u_id not in settings['tester_ids'] or 'clear' not in msg['body']:
+            messages.append(msg)
             continue
 
         used_cache[u_id] = (curr_time, set())
