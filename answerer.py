@@ -143,6 +143,7 @@ def loop(source_file_name):
 
     curr_time = int(time.time())
     messages = []
+    cache_was_modified = False
     for m in all_messages:
         msg = m['message']
         u_id = msg['user_id']
@@ -151,11 +152,15 @@ def loop(source_file_name):
             continue
 
         used_cache[u_id] = (curr_time, set())
+        cache_was_modified = True
         try:
             api.messages.send(user_id=u_id, message='done')
         except vk.exceptions.VkAPIError as error:
             logger.error('send to %s %s' % (followers[u_id], error.message))
             continue
+
+    if (cache_was_modified):
+        save(used_cache, 'used_cache.bin')
 
     build = partial(build_blocks, source_file_name, followers, used_cache)
     processes = settings['processes']
