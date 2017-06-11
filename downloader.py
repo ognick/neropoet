@@ -14,18 +14,27 @@ from sys_utilst import save, get_bar, add_postfix
 
 logger = getLogger(__name__)
 
+MAX_USERS_PER_REQUEST = 1000
+
 
 def spawn_tasks(task_queue, api, start_id, end_id):
-    users = api.groups.getMembers(
-        group_id=settings['group_id'], fields='domain')
+    total_count = MAX_USERS_PER_REQUEST
+    offset = 0
+    items = list(settings.get('publics', []))
+    while offset < total_count:
+        response = api.groups.getMembers(group_id=settings['group_id'], fields='domain')
+        items.extend(response['items'])
+        total_count = response['count']
+        offset += MAX_USERS_PER_REQUEST
+        time.sleep(settings['sleep'])
 
-    items = users['items']
-    end_id = min(users['count'] - 1, end_id)
+    end_id = min(len(items) - 1, end_id)
     for task_id in xrange(start_id, end_id):
         user = items[task_id]
-        fname = user['first_name']
-        lname = user['last_name']
         user_id = user['id']
+        name = user.get('name', 'None')
+        fname = user.get('first_name', name)
+        lname = user.get('last_name', name)
         if user_id in settings['blacklist']:
             logger.debug('SKIP %d-%s-%s' % (user_id, fname, lname))
             continue

@@ -36,9 +36,9 @@ def get_all_items(max_count_per_request, getter):
     items = []
     while offset < total_count:
         response = getter(offset=offset, count=max_count_per_request)
-        items.extend(i for i in response['items'])
+        items.extend(response['items'])
         total_count = response['count']
-        offset += MAX_USERS_PER_REQUEST
+        offset += max_count_per_request
         time.sleep(settings['sleep'])
 
     return items
